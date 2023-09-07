@@ -4,14 +4,10 @@ pipeline {
     stages {
         stage('Deploy') {
             steps {
-                retry(3) {
-                    sh 'chmod 777 flakey-deploy.sh'
-                    sh './flakey-deploy.sh'
-                }
-
                 timeout(time: 3, unit: 'MINUTES') {
-                    sh 'chmod 777 health-check.sh'
-                    sh './health-check.sh'
+                    retry(5) {
+                        sh './flakey-deploy.sh'
+                    }
                 }
             }
         }
