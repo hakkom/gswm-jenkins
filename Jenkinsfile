@@ -16,7 +16,9 @@ pipeline {
             echo 'This will run only if successful'
         }
         failure {
-            echo 'This will run only if failed'
+            mail to: 'hakan-tuna@gmx.de',
+            subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+            body: "Something ist wrong with ${env.BUILD_URL}"
         }
         unstable {
             echo 'This will run only if the run was marked as unstable'
