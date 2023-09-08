@@ -13,7 +13,8 @@ pipeline {
                 branch 'test'
             }
             steps {
-                sh './deploy.sh OMSTA'
+                //sh './deploy.sh OMSTA'
+                sh 'echo "This will run.  Allways"'
             }
         }
 
@@ -27,11 +28,10 @@ pipeline {
                         ...
                    oder:
                         cfg/$HOSTNAME/config.xml
-                        ...
-
-
+                        ....
                 */
-                sh './deploy.sh OMSPNEU'
+                //sh './deploy.sh OMSPNEU'
+                sh 'echo "This will run.  Allways"'
             }
 
             steps {
@@ -41,7 +41,8 @@ pipeline {
                    cfg_$HOSTNAME/routes/onlineinbox.xml
                    ...
                 */
-                sh './deploy.sh OMSPA'
+                //sh './deploy.sh OMSPA'
+                sh 'echo "This will run. Allways"'
             }
         }
     }
