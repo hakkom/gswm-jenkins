@@ -1,31 +1,61 @@
 /* Requires the Docker Pipeline plugin */
 pipeline {
-    agent any
+    agent { docker { image 'maven:3.9.4-eclipse-temurin-17-alpine' } }
     stages {
-        stage('Test') {
+        stage('build') {
             steps {
-                sh 'echo "Fail!"; exit 1'
+                sh 'mvn clean install'
+            }
+        }
+        /* Pro Umgebung "Entwicklung, Test, Prod" ein Branch. */
+        stage('deploy test') {
+            when {
+                branch 'test'
+            }
+            steps {
+                sh './deploy.sh OMSTA'
+            }
+        }
+
+        stage('deploy master') {
+            when {
+                branch 'master'
+            }
+            steps {
+                /* Deployment-Skripte mit Namenskonventionen für Konfig-Ordner:
+                        cfg_$HOSTNAME/config.xml
+                        ...
+                   oder:
+                        cfg/$HOSTNAME/config.xml
+                        ...
+
+
+                */
+                sh './deploy.sh OMSPNEU'
+            }
+
+            steps {
+                /* Deployment-Skripte mit Namenskonventionen für Konfig-Ordner:
+                   cfg_$HOSTNAME/config.xml
+                   cfg_$HOSTNAME/job.xml
+                   cfg_$HOSTNAME/routes/onlineinbox.xml
+                   ...
+                */
+                sh './deploy.sh OMSPA'
             }
         }
     }
     post {
         always {
-            echo 'This will always run'
+            echo 'Ich bin fertig!'
+            deleteDir()
+            echo 'Verzeichnis gelöscht.'
         }
-        success {
-            echo 'This will run only if successful'
-        }
-        failure {
-            mail to: 'hakan-tuna@gmx.de',
-            subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-            body: "Something ist wrong with ${env.BUILD_URL}"
-        }
-        unstable {
-            echo 'This will run only if the run was marked as unstable'
-        }
-        changed {
-            echo 'This will run only if the state of the Pipeline has changed'
-            echo 'For example, if the Pipeline was previously failing but is now successful'
+
+        failed {
+            echo 'Ich hab ein Problem!'
+            deleteDir()
+            echo 'Verzeichnis gelöscht.'
         }
     }
 }
