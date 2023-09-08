@@ -5,7 +5,7 @@
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'chmod 777 flakey-deploy.sh'
+                        sh 'chmod 775 flakey-deploy.sh'
                         sh './flakey-deploy.sh'
                     }
                 }
