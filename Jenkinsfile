@@ -1,61 +1,15 @@
 /* Requires the Docker Pipeline plugin */
 pipeline {
-    agent { docker { image 'maven:3.9.4-eclipse-temurin-17-alpine' } }
+    agent any
     stages {
-        stage('build') {
+        stage('Deploy') {
             steps {
-                sh 'mvn clean install'
+                timeout(time: 3, unit: 'MINUTES') {
+                    retry(5) {
+                        sh './flakey-deploy.sh'
+                    }
+                }
             }
-        }
-        /* Pro Umgebung "Entwicklung, Test, Prod" ein Branch. */
-        stage('deploy test') {
-            when {
-                branch 'test'
-            }
-            steps {
-                sh './deploy.sh OMSTA'
-            }
-        }
-
-        stage('deploy master') {
-            when {
-                branch 'master'
-            }
-            steps {
-                /* Deployment-Skripte mit Namenskonventionen für Konfig-Ordner:
-                        cfg_$HOSTNAME/config.xml
-                        ...
-                   oder:
-                        cfg/$HOSTNAME/config.xml
-                        ...
-
-
-                */
-                sh './deploy.sh OMSPNEU'
-            }
-
-            steps {
-                /* Deployment-Skripte mit Namenskonventionen für Konfig-Ordner:
-                   cfg_$HOSTNAME/config.xml
-                   cfg_$HOSTNAME/job.xml
-                   cfg_$HOSTNAME/routes/onlineinbox.xml
-                   ...
-                */
-                sh './deploy.sh OMSPA'
-            }
-        }
-    }
-    post {
-        always {
-            echo 'Ich bin fertig!'
-            deleteDir()
-            echo 'Verzeichnis gelöscht.'
-        }
-
-        failed {
-            echo 'Ich hab ein Problem!'
-            deleteDir()
-            echo 'Verzeichnis gelöscht.'
         }
     }
 }
