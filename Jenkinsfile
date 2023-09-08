@@ -6,7 +6,7 @@ pipeline {
             steps {
                 timeout(time: 3, unit: 'MINUTES') {
                     retry(5) {
-                        sh 'chmod 777  *'
+                        sh 'chmod 775  *'
                         sh './flakey-deploy.sh'
                     }
                 }
